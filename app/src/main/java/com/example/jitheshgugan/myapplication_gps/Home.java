@@ -19,8 +19,6 @@ import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
-import android.view.Display;
-import android.view.Surface;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.Button;
@@ -37,8 +35,9 @@ public class Home extends AppCompatActivity {
     public final int MY_PERMISSIONS_REQUEST_LOCATION=2;
     Context cont;
     TextView view1;
-
-    public Display mDisplay;
+    public String mDisplay;
+    TextView view2;
+    TextView textView3;
     private SensorManager mSensorManager;
     private Sensor mAccelerometer;
 
@@ -48,10 +47,14 @@ public class Home extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_home);
 
+
         cont = getApplicationContext();
         view1 = (TextView) findViewById(R.id.view1);
+        view2 = (TextView) findViewById(R.id.view2);
+        textView3 = (TextView) findViewById(R.id.textView3);
         locManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
         mSensorManager = (SensorManager) getSystemService(SENSOR_SERVICE);
+        assert mSensorManager != null;
         mAccelerometer = mSensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER);
 
         SensorEventListener sensorEventListener = new SensorEventListener() {
@@ -60,33 +63,64 @@ public class Home extends AppCompatActivity {
             }
 
             public void onSensorChanged(SensorEvent event) {
-                //Right in here is where you put code to read the current sensor values and
-                //update any views you might have that are displaying the sensor information
-                //You'd get accelerometer values like this:
                 Log.i("Sensor", event.sensor.getName() + " value: " + event.values[0]);
+                float mSensorX = 0, mSensorY = 0, mSensorZ = 0;
+                double Sam = 0;
                 if (event.sensor.getType() == Sensor.TYPE_ACCELEROMETER) {
-                    float mSensorX = 0, mSensorY = 0;
-                    switch (mDisplay.getRotation()) {
-                        case Surface.ROTATION_0:
-                            mSensorX = event.values[0];
-                            mSensorY = event.values[1];
-                            break;
-                        case Surface.ROTATION_90:
-                            mSensorX = -event.values[1];
-                            mSensorY = event.values[0];
-                            break;
-                        case Surface.ROTATION_180:
-                            mSensorX = -event.values[0];
-                            mSensorY = -event.values[1];
-                            break;
-                        case Surface.ROTATION_270:
-                            mSensorX = event.values[1];
-                            mSensorY = -event.values[0];
+                    mSensorX = event.values[0];
+                    mSensorY = event.values[1];
+                    mSensorZ = event.values[2];
+                    Sam = mSensorX;
+                    {
+                        if (Sam < mSensorY) {
+                            Sam = mSensorY;
+                        } else if (Sam < mSensorZ) {
+                            Sam = mSensorZ;
+                        }
                     }
-                    view1.setText("X: " + event.values[0] + "\nY: " + event.values[1]);
+                    {
+                        if (mSensorX == Sam) {
+                            mSensorX = 0;
+                        } else if (mSensorY == Sam) {
+                            mSensorY = 0;
+                        } else if (mSensorZ == Sam) {
+                            mSensorZ = 0;
+                        }
+                    }
                 }
+                double acc = (Math.sqrt((mSensorX * mSensorX) + (mSensorY * mSensorY) + (mSensorZ * mSensorZ)));
+                view1.setText("Acceleration : " + Math.round(acc));
+                {
+                    if (mSensorX < Sam) {
+                        Sam = mSensorX;
+                    } else if (mSensorY < Sam) {
+                        Sam = mSensorY;
+                    } else if (mSensorZ < Sam) {
+                        Sam = mSensorZ;
+                    }
+                }
+                {
+                    double Sam1 = 0, dis, spe;
+                    Sam = Sam1;
+                    Sam1 = (Sam + (acc * 0.11));
+                    dis = Sam1 + ((1 / 2) * acc * (0.04));
+                    spe = dis / 0.3;
+                    {
+                        if (spe >= 3) {
+                            textView3.setText("Speed :" + Math.round(spe) + "km/hr");
+                            view2.setText("Speed : 0 km/hr");
+                        } else {
+                            view2.setText("Speed :" + Math.round(spe) + "km/hr");
+                            textView3.setText("Speed : 0 km/hr ");
+                        }
+                    }
+                }
+
             }
+
         };
+
+
         mSensorManager.registerListener(sensorEventListener,
                 mAccelerometer,
                 SensorManager.SENSOR_DELAY_NORMAL);
