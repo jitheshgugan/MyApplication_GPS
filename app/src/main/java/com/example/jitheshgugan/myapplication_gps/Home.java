@@ -66,6 +66,8 @@ public class Home extends AppCompatActivity {
                 Log.i("Sensor", event.sensor.getName() + " value: " + event.values[0]);
                 float mSensorX = 0, mSensorY = 0, mSensorZ = 0;
                 double Sam = 0;
+                double Sam1 = 0, dis, spe, pacc = 0, ptime = 0, time = 0;
+
                 if (event.sensor.getType() == Sensor.TYPE_ACCELEROMETER) {
                     mSensorX = event.values[0];
                     mSensorY = event.values[1];
@@ -90,21 +92,12 @@ public class Home extends AppCompatActivity {
                 }
                 double acc = (Math.sqrt((mSensorX * mSensorX) + (mSensorY * mSensorY) + (mSensorZ * mSensorZ)));
                 view1.setText("Acceleration : " + Math.round(acc));
+
                 {
-                    if (mSensorX < Sam) {
-                        Sam = mSensorX;
-                    } else if (mSensorY < Sam) {
-                        Sam = mSensorY;
-                    } else if (mSensorZ < Sam) {
-                        Sam = mSensorZ;
-                    }
-                }
-                {
-                    double Sam1 = 0, dis, spe;
-                    Sam = Sam1;
-                    Sam1 = (Sam + (acc * 0.11));
-                    dis = Sam1 + ((1 / 2) * acc * (0.04));
-                    spe = dis / 0.3;
+                    time = System.currentTimeMillis() - ptime;
+                    spe = ((acc - pacc) * (1000 * 3600)) / time;
+                    pacc = spe;
+                    ptime = time;
                     {
                         if (spe >= 3) {
                             textView3.setText("Speed :" + Math.round(spe) + "km/hr");
