@@ -25,6 +25,8 @@ import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import java.util.ArrayList;
+
 import static android.Manifest.permission.ACCESS_FINE_LOCATION;
 
 
@@ -40,6 +42,11 @@ public class Home extends AppCompatActivity {
     TextView textView3;
     private SensorManager mSensorManager;
     private Sensor mAccelerometer;
+    static private double pacc = 0;
+    static private double ptime = System.currentTimeMillis();
+    static private double bacc = pacc;
+    ArrayList<Double> apacc = new ArrayList<Double>();
+    ArrayList<Double> aptime = new ArrayList<Double>();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -66,9 +73,9 @@ public class Home extends AppCompatActivity {
                 Log.i("Sensor", event.sensor.getName() + " value: " + event.values[0]);
                 float mSensorX = 0, mSensorY = 0, mSensorZ = 0;
                 double Sam = 0;
-                double Sam1 = 0, dis, spe, pacc = 0, ptime = 0, time = 0;
-
-                if (event.sensor.getType() == Sensor.TYPE_ACCELEROMETER) {
+                double Sam1 = 0, dis, spe = 0, time = 0;
+                int j = 0;
+                if (event.sensor.getType() == Sensor.TYPE_LINEAR_ACCELERATION) {
                     mSensorX = event.values[0];
                     mSensorY = event.values[1];
                     mSensorZ = event.values[2];
@@ -94,23 +101,37 @@ public class Home extends AppCompatActivity {
                 view1.setText("Acceleration : " + Math.round(acc));
 
                 {
-                    time = System.currentTimeMillis() - ptime;
-                    spe = ((acc - pacc) * (1000 * 3600)) / time;
-                    pacc = spe;
-                    ptime = time;
                     {
-                        if (spe >= 3) {
-                            textView3.setText("Speed :" + Math.round(spe) + "km/hr");
-                            view2.setText("Speed : 0 km/hr");
-                        } else {
-                            view2.setText("Speed :" + Math.round(spe) + "km/hr");
-                            textView3.setText("Speed : 0 km/hr ");
+                        if (pacc == acc) {
+                            int i = 0;
+                            while (i < 10)
+                                if (apacc.get(i) != acc) {
+                                    pacc = apacc.get(i);
+                                    ptime = aptime.get(i);
+                                    i = 10;
+                                }
                         }
                     }
-                }
 
+
+                    time = System.currentTimeMillis() - ptime;
+                    spe = (Math.abs(acc - pacc) * 3600) / time;
+
+                    ptime = time;
+
+
+                    final String TAG = "MyActivity";
+                    Log.d(TAG, "pcc: " + pacc + "acc: " + acc);
+                    pacc = acc;
+                    if (j >= 9) {
+                        apacc.add(j, acc);
+                        aptime.add(j, ptime);
+                    } else {
+                        j = 0;
+                    }
+                    textView3.setText("Speed :" + Math.round(spe) + "km/hr");
+                    }
             }
-
         };
 
 
