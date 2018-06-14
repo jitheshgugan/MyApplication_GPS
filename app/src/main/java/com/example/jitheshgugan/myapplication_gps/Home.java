@@ -131,7 +131,7 @@ public class Home extends AppCompatActivity {
 
                     spe = accSum * 3600 / timeSum;
                     if (aptime.size() >= 10) {
-
+                        apacc.remove(0);
                         aptime.remove(0);
                         apti = aptime.get(0);
                         List<Double> tempTime = new ArrayList<>();
