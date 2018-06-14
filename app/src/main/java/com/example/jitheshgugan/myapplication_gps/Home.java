@@ -1,6 +1,7 @@
 package com.example.jitheshgugan.myapplication_gps;
 
 import android.Manifest;
+import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.Context;
@@ -19,13 +20,11 @@ import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
-import android.view.View;
-import android.view.View.OnClickListener;
-import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import java.util.ArrayList;
+import java.util.List;
 
 import static android.Manifest.permission.ACCESS_FINE_LOCATION;
 
@@ -38,15 +37,18 @@ public class Home extends AppCompatActivity {
     Context cont;
     TextView view1;
     public String mDisplay;
+    static private double startTime = 0;
     TextView view2;
     TextView textView3;
     private SensorManager mSensorManager;
     private Sensor mAccelerometer;
     static private double pacc = 0;
     static private double ptime = System.currentTimeMillis();
+    double apti = 0;
     static private double bacc = pacc;
     ArrayList<Double> apacc = new ArrayList<Double>();
     ArrayList<Double> aptime = new ArrayList<Double>();
+    ArrayList<Double> apSysTime = new ArrayList<Double>();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -54,23 +56,27 @@ public class Home extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_home);
 
+        apacc.add(0, (double) 0);
+        aptime.add(0, (double) 0);
+        apSysTime.add(ptime);
 
         cont = getApplicationContext();
         view1 = (TextView) findViewById(R.id.view1);
-        view2 = (TextView) findViewById(R.id.view2);
+
         textView3 = (TextView) findViewById(R.id.textView3);
         locManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
         mSensorManager = (SensorManager) getSystemService(SENSOR_SERVICE);
         assert mSensorManager != null;
-        mAccelerometer = mSensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER);
+        mAccelerometer = mSensorManager.getDefaultSensor(Sensor.TYPE_LINEAR_ACCELERATION);
 
         SensorEventListener sensorEventListener = new SensorEventListener() {
 
             public void onAccuracyChanged(Sensor sensor, int accuracy) {
             }
 
+            @SuppressLint("SetTextI18n")
             public void onSensorChanged(SensorEvent event) {
-                Log.i("Sensor", event.sensor.getName() + " value: " + event.values[0]);
+                // Log.i("Sensor", event.sensor.getName() + " value: " + event.values[0]);
                 float mSensorX = 0, mSensorY = 0, mSensorZ = 0;
                 double Sam = 0;
                 double Sam1 = 0, dis, spe = 0, time = 0;
@@ -80,7 +86,7 @@ public class Home extends AppCompatActivity {
                     mSensorY = event.values[1];
                     mSensorZ = event.values[2];
                     Sam = mSensorX;
-                    {
+                    /*{
                         if (Sam < mSensorY) {
                             Sam = mSensorY;
                         } else if (Sam < mSensorZ) {
@@ -95,42 +101,60 @@ public class Home extends AppCompatActivity {
                         } else if (mSensorZ == Sam) {
                             mSensorZ = 0;
                         }
-                    }
+                    }*/
                 }
+
                 double acc = (Math.sqrt((mSensorX * mSensorX) + (mSensorY * mSensorY) + (mSensorZ * mSensorZ)));
                 view1.setText("Acceleration : " + Math.round(acc));
 
                 {
-                    {
-                        if (pacc == acc) {
-                            int i = 0;
-                            while (i < 10)
-                                if (apacc.get(i) != acc) {
-                                    pacc = apacc.get(i);
-                                    ptime = aptime.get(i);
-                                    i = 10;
-                                }
+
+                    double measureTime = System.currentTimeMillis();
+
+                    time = measureTime - ptime;
+
+                    apacc.add(acc);
+                    aptime.add(time);
+                    apSysTime.add(measureTime);
+
+                    Double accSum = Double.valueOf(0);
+
+                    for (Double accEle : apacc) {
+                        accSum += accEle;
+                    }
+
+                    Double timeSum = Double.valueOf(0);
+
+                    for (Double timeEle : aptime) {
+                        timeSum += timeEle;
+                    }
+
+                    spe = accSum * 3600 / timeSum;
+                    if (aptime.size() >= 10) {
+
+                        aptime.remove(0);
+                        apti = aptime.get(0);
+                        List<Double> tempTime = new ArrayList<>();
+                        for (Double apt : aptime) {
+                            apt -= apti;
+                            tempTime.add(apt);
                         }
+                        aptime.clear();
+                        aptime.addAll(tempTime);
+                        apSysTime.remove(0);
+                        ptime = apSysTime.get(0);
                     }
 
 
-                    time = System.currentTimeMillis() - ptime;
-                    spe = (Math.abs(acc - pacc) * 3600) / time;
-
-                    ptime = time;
+                    /*Upload data to server*/
 
 
-                    final String TAG = "MyActivity";
-                    Log.d(TAG, "pcc: " + pacc + "acc: " + acc);
-                    pacc = acc;
-                    if (j >= 9) {
-                        apacc.add(j, acc);
-                        aptime.add(j, ptime);
-                    } else {
-                        j = 0;
-                    }
+                    //view2.setText("Speed :" + Math.round(pspe) + "km/hr");
+                    //Log.i("List val", "Speed"+apacc.toString());
+                    Log.i("List val", "Time" + aptime.toString());
+
                     textView3.setText("Speed :" + Math.round(spe) + "km/hr");
-                    }
+                }
             }
         };
 
@@ -139,16 +163,6 @@ public class Home extends AppCompatActivity {
                 mAccelerometer,
                 SensorManager.SENSOR_DELAY_NORMAL);
 
-        Button functionally;
-            functionally = (Button)findViewById(R.id.button1);
-
-            // CALL FUNCTION ON BUTTON CLICK METHOD.
-            functionally.setOnClickListener(new OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    functionally();
-                }
-            });
 
             }
         //li = new speed();
