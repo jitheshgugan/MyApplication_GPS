@@ -158,7 +158,6 @@ public class Home extends AppCompatActivity {
 
     }
 
-}
 
 
     private void checkForLocationPermission() {
@@ -166,16 +165,14 @@ public class Home extends AppCompatActivity {
         if (ContextCompat.checkSelfPermission(this,
                 Manifest.permission.ACCESS_COARSE_LOCATION)
                 != PackageManager.PERMISSION_GRANTED) {
-            if (ActivityCompat.shouldShowRequestPermissionRationale(LocationListener.this, Manifest.permission.ACCESS_COARSE_LOCATION)) {
+            if (ActivityCompat.shouldShowRequestPermissionRationale(, Manifest.permission.ACCESS_COARSE_LOCATION)) {
                 AlertDialog.Builder alertBuilder = new AlertDialog.Builder(this);
                 alertBuilder.setCancelable(true);
                 alertBuilder.setTitle("Location permission necessary");
                 alertBuilder.setPositiveButton(android.R.string.yes, new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
-                        ActivityCompat.requestPermissions(onSensorChanged.this,
-                                new String[]{Manifest.permission.ACCESS_COARSE_LOCATION},
-                                MY_PERMISSIONS_REQUEST_LOCATION);
+                        ActivityCompat.requestPermissions(new String[]{Manifest.permission.ACCESS_COARSE_LOCATION}, this, MY_PERMISSIONS_REQUEST_LOCATION);
                     }
                 });
 
