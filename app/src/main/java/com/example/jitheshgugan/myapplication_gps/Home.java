@@ -2,6 +2,7 @@ package com.example.jitheshgugan.myapplication_gps;
 
 import android.Manifest;
 import android.annotation.SuppressLint;
+import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
@@ -56,6 +57,8 @@ public class Home extends AppCompatActivity {
 
         cont = getApplicationContext();
         view1 = (TextView) findViewById(R.id.view1);
+
+        checkForLocationPermission();
 
         textView3 = (TextView) findViewById(R.id.textView3);
         locManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
@@ -165,30 +168,34 @@ public class Home extends AppCompatActivity {
         if (ContextCompat.checkSelfPermission(this,
                 Manifest.permission.ACCESS_COARSE_LOCATION)
                 != PackageManager.PERMISSION_GRANTED) {
-            if (ActivityCompat.shouldShowRequestPermissionRationale(, Manifest.permission.ACCESS_COARSE_LOCATION)) {
-                AlertDialog.Builder alertBuilder = new AlertDialog.Builder(this);
-                alertBuilder.setCancelable(true);
-                alertBuilder.setTitle("Location permission necessary");
-                alertBuilder.setPositiveButton(android.R.string.yes, new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
-                        ActivityCompat.requestPermissions(new String[]{Manifest.permission.ACCESS_COARSE_LOCATION}, this, MY_PERMISSIONS_REQUEST_LOCATION);
-                    }
-                });
-
-                AlertDialog alert = alertBuilder.create();
-                alert.show();
-            } else {
-                // No explanation needed, we can request the permission.
-                ActivityCompat.requestPermissions(this,
-                        new String[]{Manifest.permission.ACCESS_COARSE_LOCATION},
-                        MY_PERMISSIONS_REQUEST_LOCATION);
-                // MY_PERMISSIONS_REQUEST_CAMERA is an
-                // app-defined int constant. The callback method gets the
-                // result of the request.
+            if (ActivityCompat.shouldShowRequestPermissionRationale((Activity) cont, Manifest.permission.ACCESS_COARSE_LOCATION)) {
+                if (ActivityCompat.shouldShowRequestPermissionRationale((Activity) cont, Manifest.permission.ACCESS_COARSE_LOCATION)) {
+                    AlertDialog.Builder alertBuilder = new AlertDialog.Builder(this);
+                    alertBuilder.setCancelable(true);
+                    alertBuilder.setTitle("Location permission necessary");
+                    alertBuilder.setPositiveButton(android.R.string.yes, new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {
+                            ActivityCompat.requestPermissions((Activity) cont, new String[]{Manifest.permission.ACCESS_COARSE_LOCATION}, MY_PERMISSIONS_REQUEST_LOCATION);
+                            ActivityCompat.requestPermissions((Activity) cont, new String[]{Manifest.permission.ACCESS_COARSE_LOCATION}, MY_PERMISSIONS_REQUEST_LOCATION);
+                        }
+                    });
+                }
             }
-        } else {
-
         }
     }
+
+    void onoroffline() {
+        if (Manifest.permission.ACCESS_COARSE_LOCATION != 0) {
+            onCreate(Bundle.EMPTY);
+        } else {
+            li.onLocationChanged();
+            float thespeed = locManager.getSpeed;
+            textView3.setText("Speed :" + thespeed + "km/hr");
+    }
+    }
 }
+
+
+
+
