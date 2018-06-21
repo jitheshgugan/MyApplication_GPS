@@ -1,7 +1,6 @@
 package com.example.jitheshgugan.myapplication_gps;
 
 import android.Manifest;
-import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.Context;
@@ -11,6 +10,7 @@ import android.hardware.Sensor;
 import android.hardware.SensorEvent;
 import android.hardware.SensorEventListener;
 import android.hardware.SensorManager;
+import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
 import android.os.Bundle;
@@ -71,7 +71,7 @@ public class Home extends AppCompatActivity {
             public void onAccuracyChanged(Sensor sensor, int accuracy) {
             }
 
-            @SuppressLint("SetTextI18n")
+
             public void onSensorChanged(SensorEvent event) {
                 // Log.i("Sensor", event.sensor.getName() + " value: " + event.values[0]);
                 float mSensorX = 0, mSensorY = 0, mSensorZ = 0;
@@ -162,37 +162,68 @@ public class Home extends AppCompatActivity {
     }
 
 
-
     private void checkForLocationPermission() {
         // Here, thisActivity is the current activity
-        if (ContextCompat.checkSelfPermission(this,
-                Manifest.permission.ACCESS_COARSE_LOCATION)
-                != PackageManager.PERMISSION_GRANTED) {
-            if (ActivityCompat.shouldShowRequestPermissionRationale((Activity) cont, Manifest.permission.ACCESS_COARSE_LOCATION)) {
-                if (ActivityCompat.shouldShowRequestPermissionRationale((Activity) cont, Manifest.permission.ACCESS_COARSE_LOCATION)) {
-                    AlertDialog.Builder alertBuilder = new AlertDialog.Builder(this);
-                    alertBuilder.setCancelable(true);
-                    alertBuilder.setTitle("Location permission necessary");
-                    alertBuilder.setPositiveButton(android.R.string.yes, new DialogInterface.OnClickListener() {
-                        @Override
-                        public void onClick(DialogInterface dialog, int which) {
-                            ActivityCompat.requestPermissions((Activity) cont, new String[]{Manifest.permission.ACCESS_COARSE_LOCATION}, MY_PERMISSIONS_REQUEST_LOCATION);
-                            ActivityCompat.requestPermissions((Activity) cont, new String[]{Manifest.permission.ACCESS_COARSE_LOCATION}, MY_PERMISSIONS_REQUEST_LOCATION);
-                        }
-                    });
-                }
+        if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+            if (ActivityCompat.shouldShowRequestPermissionRationale(this, Manifest.permission.ACCESS_COARSE_LOCATION)) {
+                AlertDialog.Builder alertBuilder = new AlertDialog.Builder(this);
+                alertBuilder.setCancelable(true);
+                alertBuilder.setTitle("Location permission necessary");
+                alertBuilder.setPositiveButton(android.R.string.yes, new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        ActivityCompat.requestPermissions((Activity) cont, new String[]{Manifest.permission.ACCESS_COARSE_LOCATION}, MY_PERMISSIONS_REQUEST_LOCATION);
+                    }
+                });
+
+                AlertDialog alert = alertBuilder.create();
+                alert.show();
+            } else {
+                // No explanation needed, we can request the permission.
+                ActivityCompat.requestPermissions(this,
+                        new String[]{Manifest.permission.ACCESS_COARSE_LOCATION},
+                        MY_PERMISSIONS_REQUEST_LOCATION);
+                // MY_PERMISSIONS_REQUEST_LOCATION is an
+                // app-defined int constant. The callback method gets the
+                // result of the request.
             }
+            calculatespeedwithlocation();
+            // mSensorManager.unregisterListener(,mAccelerometer);
+
+        } else {
+
+
         }
     }
 
-    void onoroffline() {
-        if (Manifest.permission.ACCESS_COARSE_LOCATION != 0) {
-            onCreate(Bundle.EMPTY);
-        } else {
-            li.onLocationChanged();
-            float thespeed = locManager.getSpeed;
-            textView3.setText("Speed :" + thespeed + "km/hr");
-    }
+
+    public void calculatespeedwithlocation() {
+
+
+        locManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
+
+
+        class speed implements LocationListener {
+            @Override
+            public void onLocationChanged(Location loc) {
+                Float thespeed = loc.getSpeed();
+                textView3.setText("Speed :" + thespeed + "km/hr");
+
+            }
+
+            @Override
+            public void onProviderDisabled(String arg0) {
+            }
+
+            @Override
+            public void onProviderEnabled(String arg0) {
+            }
+
+            @Override
+            public void onStatusChanged(String arg0, int arg1, Bundle arg2) {
+            }
+
+        }
     }
 }
 
