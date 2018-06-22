@@ -35,6 +35,7 @@ public class Home extends AppCompatActivity {
     static private double startTime = 0;
     TextView view2;
     TextView textView3;
+    TextView view4;
     private SensorManager mSensorManager;
     private Sensor mAccelerometer;
     static private double pacc = 0;
@@ -57,14 +58,14 @@ public class Home extends AppCompatActivity {
 
         cont = getApplicationContext();
         view1 = (TextView) findViewById(R.id.view1);
-
+        view4 = (TextView) findViewById(R.id.view4);
         checkForLocationPermission();
-
         textView3 = (TextView) findViewById(R.id.textView3);
         locManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
         mSensorManager = (SensorManager) getSystemService(SENSOR_SERVICE);
         assert mSensorManager != null;
         mAccelerometer = mSensorManager.getDefaultSensor(Sensor.TYPE_LINEAR_ACCELERATION);
+
 
         SensorEventListener sensorEventListener = new SensorEventListener() {
 
@@ -102,7 +103,7 @@ public class Home extends AppCompatActivity {
                 }
 
                 double acc = (Math.sqrt((mSensorX * mSensorX) + (mSensorY * mSensorY) + (mSensorZ * mSensorZ)));
-                view1.setText("Acceleration : " + Math.round(acc));
+                //view1.setText("Acceleration : " + Math.round(acc));
 
                 {
 
@@ -148,9 +149,9 @@ public class Home extends AppCompatActivity {
 
                     //view2.setText("Speed :" + Math.round(pspe) + "km/hr");
                     //Log.i("List val", "Speed"+apacc.toString());
-                    Log.i("List val", "Time" + aptime.toString());
+                    //  Log.i("List val", "Time" + aptime.toString());
 
-                    textView3.setText("Speed :" + Math.round(spe) + "km/hr");
+                    view1.setText("Speed :" + Math.round(spe) + "km/hr");
                 }
             }
         };
@@ -164,7 +165,7 @@ public class Home extends AppCompatActivity {
 
     private void checkForLocationPermission() {
         // Here, thisActivity is the current activity
-        if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+        if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
             if (ActivityCompat.shouldShowRequestPermissionRationale(this, Manifest.permission.ACCESS_COARSE_LOCATION)) {
                 AlertDialog.Builder alertBuilder = new AlertDialog.Builder(this);
                 alertBuilder.setCancelable(true);
@@ -187,17 +188,47 @@ public class Home extends AppCompatActivity {
                 // app-defined int constant. The callback method gets the
                 // result of the request.
             }
-            calculatespeedwithlocation();
-            // mSensorManager.unregisterListener(,mAccelerometer);
+
 
         } else {
+            //   mSensorManager.unregisterListener(SensorEventListener,mAccelerometer, SensorManager.SENSOR_DELAY_NORMAL);
+
+            locManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
+            li = new speed();
+            locManager.requestLocationUpdates(LocationManager.NETWORK_PROVIDER, 0, 0, li);
+            locManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 0, 0, li);
 
 
         }
     }
 
+    class speed implements LocationListener {
+        @Override
+        public void onLocationChanged(Location loc) {
+            Float thespeed = loc.getSpeed();
+            textView3.setText("Speed :" + thespeed + "km/hr");
+            view4.setText("Location" + loc.getLatitude());
+            Log.i("Location Speed", String.valueOf(thespeed) + "Latitude" + loc.getLatitude());
 
-    public void calculatespeedwithlocation() {
+
+        }
+
+        @Override
+        public void onProviderDisabled(String arg0) {
+        }
+
+        @Override
+        public void onProviderEnabled(String arg0) {
+        }
+
+        @Override
+        public void onStatusChanged(String arg0, int arg1, Bundle arg2) {
+        }
+
+    }
+
+
+    /*public void calculatespeedwithlocation() {
 
 
         locManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
@@ -208,6 +239,9 @@ public class Home extends AppCompatActivity {
             public void onLocationChanged(Location loc) {
                 Float thespeed = loc.getSpeed();
                 textView3.setText("Speed :" + thespeed + "km/hr");
+              // view4.setText("Location"+loc.getLatitude());
+                Log.i("Location Speed", String.valueOf( thespeed)+ "Latitude" +loc.getLatitude());
+
 
             }
 
@@ -224,7 +258,10 @@ public class Home extends AppCompatActivity {
             }
 
         }
-    }
+        li = new speed();
+        locManager.requestLocationUpdates(LocationManager.NETWORK_PROVIDER, 4000, 0, li);
+        locManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 4000, 0, li);
+    }*/
 }
 
 
