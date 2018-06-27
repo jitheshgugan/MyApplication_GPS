@@ -1,14 +1,10 @@
 package com.example.jitheshgugan.myapplication_gps;
 
 import android.Manifest;
-import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.app.AlertDialog;
-import android.app.PendingIntent;
 import android.content.Context;
 import android.content.DialogInterface;
-import android.content.Intent;
-import android.content.IntentSender;
 import android.content.pm.PackageManager;
 import android.hardware.Sensor;
 import android.hardware.SensorEvent;
@@ -17,7 +13,6 @@ import android.hardware.SensorManager;
 import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
-import android.nfc.Tag;
 import android.os.Bundle;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
@@ -25,10 +20,8 @@ import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.widget.TextView;
 
-import com.google.android.gms.common.ConnectionResult;
-import com.google.android.gms.common.GooglePlayServicesUtil;
-import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.location.Geofence;
+import com.google.android.gms.location.GeofencingClient;
 import com.google.android.gms.location.LocationServices;
 
 import java.security.KeyStore;
@@ -241,7 +234,7 @@ public class Home extends AppCompatActivity {
     }
 
 
-    public static class mGeofenceList extends Activity implements GoogleApiClient.ConnectionCallbacks,
+    /*public static class mGeofenceList extends Activity implements GoogleApiClient.ConnectionCallbacks,
             GoogleApiClient.OnConnectionFailedListener {
 
         // Internal List of Geofence objects. In a real app, these might be provided by an API based on
@@ -287,10 +280,10 @@ public class Home extends AppCompatActivity {
             createGeofences();
         }
 
-        /**
+        *//**
          * In this sample, the geofences are predetermined and are hard-coded here. A real app might
          * dynamically create geofences based on the user's location.
-         */
+     *//*
         public void createGeofences() {
             // Create internal "flattened" objects containing the geofence data.
             mAndroidBuildingGeofence = new SimpleGeofence(ANDROID_BUILDING_ID, ANDROID_BUILDING_LATITUDE, ANDROID_BUILDING_LONGITUDE, ANDROID_BUILDING_RADIUS_METERS, GEOFENCE_EXPIRATION_TIME, Geofence.GEOFENCE_TRANSITION_ENTER | Geofence.GEOFENCE_TRANSITION_EXIT);
@@ -318,9 +311,9 @@ public class Home extends AppCompatActivity {
             }
         }
 
-        /**
+        *//**
          * Once the connection is available, send a request to add the Geofences.
-         */
+     *//*
         @Override
         public void onConnected(Bundle connectionHint) {
             // Get the PendingIntent for the geofence monitoring request.
@@ -348,11 +341,11 @@ public class Home extends AppCompatActivity {
             }
         }
 
-        /**
+        *//**
          * Checks if Google Play services is available.
          *
          * @return true if it is.
-         */
+     *//*
         @SuppressLint({"LogTagMismatch", "LongLogTag"})
         private boolean isGooglePlayServicesAvailable() {
             int resultCode = GooglePlayServicesUtil.isGooglePlayServicesAvailable(this);
@@ -367,10 +360,12 @@ public class Home extends AppCompatActivity {
             }
         }
 
-        /**
+        */
+
+    /**
          * Create a PendingIntent that triggers GeofenceTransitionIntentService when a geofence
          * transition occurs.
-         */
+     *//*
         private PendingIntent getGeofenceTransitionPendingIntent() {
             Intent intent = new Intent(this, GeofenceTransitionsIntentService.class);
             return PendingIntent.getService(this, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT);
@@ -381,5 +376,17 @@ public class Home extends AppCompatActivity {
             ADD
         }
 
+    }*/
+    private void createGeofence(Location location, int radius) {
+        GeofencingClient geofencingClient = LocationServices.getGeofencingClient(cont);
+        List<Geofence> geofenceList = new ArrayList<>();
+        geofenceList.add(new Geofence.Builder()
+                .setRequestId("limit_1_fence")
+                .setCircularRegion(
+                        location.getLatitude(),
+                        location.getLongitude(),
+                        radius).build());
+
     }
+
 }
