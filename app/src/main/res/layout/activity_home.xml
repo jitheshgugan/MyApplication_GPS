@@ -13,7 +13,7 @@
         android:layout_height="wrap_content"
         android:layout_alignParentTop="true"
         android:layout_centerHorizontal="true"
-        android:layout_marginTop="117dp"
+        android:layout_marginTop="102dp"
         android:text="@string/_0"
         android:textColor="@android:color/holo_orange_dark"
         android:textSize="30sp"
@@ -40,5 +40,14 @@
         android:text="0"
         android:textColor="@android:color/holo_purple"
         android:textSize="36sp" />
+
+    <Button
+        android:id="@+id/button"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:layout_toEndOf="@+id/view1"
+        android:onClick="buttonClicked"
+        android:text="Button" />
 
 </RelativeLayout>
