@@ -62,6 +62,7 @@ public class Home extends AppCompatActivity {
     ArrayList<Double> aptime = new ArrayList<Double>();
     ArrayList<Double> apSysTime = new ArrayList<Double>();
     PendingIntent pendingIntent;
+    Location loca;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -165,7 +166,7 @@ public class Home extends AppCompatActivity {
 
 
                     //view2.setText("Speed :" + Math.round(pspe) + "km/hr");
-                    Log.i("List val", "Speed" + apacc.toString());
+                    //  Log.i("List val", "Speed" + apacc.toString());
                     //  Log.i("List val", "Time" + aptime.toString());
 
                     view1.setText("Speed :" + Math.round(spe) + "km/hr");
@@ -183,24 +184,25 @@ public class Home extends AppCompatActivity {
     private void checkForLocationPermission() {
         // Here, thisActivity is the current activity
         if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
-            if (ActivityCompat.shouldShowRequestPermissionRationale(this, Manifest.permission.ACCESS_COARSE_LOCATION)) {
+            if (ActivityCompat.shouldShowRequestPermissionRationale(this, Manifest.permission.ACCESS_FINE_LOCATION)) {
                 AlertDialog.Builder alertBuilder = new AlertDialog.Builder(this);
                 alertBuilder.setCancelable(true);
                 alertBuilder.setTitle("Location permission necessary");
                 alertBuilder.setPositiveButton(android.R.string.yes, new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
-                        ActivityCompat.requestPermissions((Activity) cont, new String[]{Manifest.permission.ACCESS_COARSE_LOCATION}, MY_PERMISSIONS_REQUEST_LOCATION);
+                        ActivityCompat.requestPermissions((Activity) cont, new String[]{Manifest.permission.ACCESS_FINE_LOCATION}, MY_PERMISSIONS_REQUEST_LOCATION);
                     }
                 });
 
                 AlertDialog alert = alertBuilder.create();
                 alert.show();
+                checkForLocationPermission();
 
             } else {
                 // No explanation needed, we can request the permission.
                 ActivityCompat.requestPermissions(this,
-                        new String[]{Manifest.permission.ACCESS_COARSE_LOCATION},
+                        new String[]{Manifest.permission.ACCESS_FINE_LOCATION},
                         MY_PERMISSIONS_REQUEST_LOCATION);
                 // MY_PERMISSIONS_REQUEST_LOCATION is an
                 // app-defined int constant. The callback method gets the
@@ -208,7 +210,7 @@ public class Home extends AppCompatActivity {
             }
 
 
-        } else {
+        }
             //  mSensorManager.unregisterListener(SensorEventListener SensorEventListener,mAccelerometer, SensorManager.SENSOR_DELAY_NORMAL);
 
             locManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
@@ -216,8 +218,6 @@ public class Home extends AppCompatActivity {
             locManager.requestLocationUpdates(LocationManager.NETWORK_PROVIDER, 0, 0, li);
             locManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 0, 0, li);
 
-
-        }
     }
 
     private void createGeofence(double latitude, double longitude, int radius) {
@@ -249,29 +249,28 @@ public class Home extends AppCompatActivity {
                 AlertDialog alert = alertBuilder.create();
                 alert.show();
 
-            } else {
-                // No explanation needed, we can request the permission.
-                ActivityCompat.requestPermissions(this,
-                        new String[]{Manifest.permission.ACCESS_FINE_LOCATION},
-                        MY_PERMISSIONS_REQUEST_LOCATION);
-                // MY_PERMISSIONS_REQUEST_LOCATION is an
-                // app-defined int constant. The callback method gets the
-                // result of the request.
             }
         }
+        ActivityCompat.requestPermissions(this,
+                new String[]{Manifest.permission.ACCESS_FINE_LOCATION},
+                MY_PERMISSIONS_REQUEST_LOCATION);
+
         geofencingClient.addGeofences(builder.build(), getGeofencePendingIntent()).addOnSuccessListener(new OnSuccessListener<Void>() {
-            @Override
+
             public void onSuccess(Void aVoid) {
                 Toast.makeText(cont, "Fence Created Successfully", Toast.LENGTH_LONG).show();
+                Log.i("GEOFENCE", "Created Successfully");
+
+
 
             }
         }).addOnFailureListener(new OnFailureListener() {
-            @Override
+
             public void onFailure(@NonNull Exception e) {
-                Toast.makeText(cont, "Fence creation Failed Error :" + e.getMessage(), Toast.LENGTH_SHORT).show();
+                Toast.makeText(cont, "Fence creation Failed Error :" + e.getMessage(), Toast.LENGTH_LONG).show();
+                Log.i("GEOFENCE", "Failed");
             }
         });
-
 
     }
 
@@ -289,18 +288,21 @@ public class Home extends AppCompatActivity {
     }
 
     public void buttonClicked(View view) {
-        createGeofence(13.035233, 80.254267, 30);
+        if (loca != null) {
+            double lat = loca.getLatitude();
+            double lon = loca.getLongitude();
+            createGeofence(lat, lon, 30);
+        }
     }
 
     class speed implements LocationListener {
         @Override
         public void onLocationChanged(Location loc) {
-
-
+            loca = loc;
             Float thespeed = loc.getSpeed();
-            textView3.setText("Speed :" + thespeed + "km/hr");
-            view4.setText("Location" + loc.getLatitude());
-            Log.i("Location Speed", String.valueOf(thespeed) + "Latitude" + loc.getLatitude());
+            textView3.setText("Speed :" + Math.round(thespeed) + "km/hr");
+            //view4.setText("Location" + loc.getLatitude());
+            //Log.i("Location Speed", String.valueOf(thespeed) + "Latitude" + loc.getLatitude());
         }
 
         @Override
@@ -316,4 +318,5 @@ public class Home extends AppCompatActivity {
         }
 
     }
+
 }

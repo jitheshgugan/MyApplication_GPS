@@ -16,13 +16,9 @@ public class GeofenceIntent extends IntentService {
     private final String TAG = GeofenceIntent.class.getSimpleName();
     private GoogleApiAvailability GeofenceErrorMessages;
 
-    /**
-     * Creates an IntentService.  Invoked by your subclass's constructor.
-     *
-     * @param name Used to name the worker thread, important only for debugging.
-     */
-    public GeofenceIntent(String name) {
-        super(name);
+
+    public GeofenceIntent() {
+        super("GeofenceIntent");
     }
 
     @Override
@@ -54,7 +50,10 @@ public class GeofenceIntent extends IntentService {
             // Log the error.
             Log.e(TAG, "Doing Nothing");
         }
+
+
     }
+
 
     private String getGeofenceTransitionDetails(GeofenceIntent geofenceIntent,
                                                 int geofenceTransition, List<Geofence> triggeringGeofences) {
